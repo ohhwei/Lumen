@@ -259,7 +259,7 @@ export default function ResultPage() {
           <div>
             <h4 className="text-subtitle mb-4">参考资料</h4>
             <div className="space-y-3">
-              {analysisResult.status !== "done" ? (
+              {!analysisResult || analysisResult.status !== "done" ? (
                 <div className="animate-pulse bg-gray-100 h-12 rounded mb-2" />
               ) : (
                 <div className="space-y-3">
@@ -549,7 +549,7 @@ export default function ResultPage() {
         />
         <div className="flex-1 text-center">
           <span
-            className="text-title truncate max-w-xl inline-block align-middle"
+            className="text-title inline-block align-middle"
             title={videoTitle}
           >
             {videoTitle}
@@ -636,7 +636,7 @@ export default function ResultPage() {
                         height: "100%",
                       }}
                     >
-                      <div className="text-body chapter-title">
+                      <div className="text-body chapter-title truncate" style={{ maxWidth: "100%" }}>
                         {chapter.title}
                       </div>
                       <div className="text-secondary">{chapter.time}</div>

@@ -564,7 +564,7 @@ function normalizeKeywords(raw) {
 }
 
 function normalizeLearningGuide(raw) {
-  return JSON.parse(raw);
+  return safeJson(raw);
 }
 
 function normalizeChapters(raw) {
