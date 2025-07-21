@@ -103,8 +103,8 @@ export default function LoadingPage() {
         <div className="text-2xl font-bold text-gray-900 mb-4 text-center">
           正在分析视频内容
         </div>
-        <div className="text-gray-500 mb-8 text-center">
-          请稍候1~3分钟，AI正在为您提取和解析视频中的知识点…
+        <div className="text-secondary mb-4">
+          可能需稍候3~5分钟
         </div>
         <Progress
           percent={progress}
@@ -119,7 +119,7 @@ export default function LoadingPage() {
         </div>
         {/* 当前步骤，居中展示 */}
         <div className="w-full flex justify-center items-center mb-8">
-          <span className="text-lg text-gray-600">{currentStepText}</span>
+          <span className="text-body">{currentStepText}</span>
         </div>
         <Button
           type="text"

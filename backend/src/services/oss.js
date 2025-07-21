@@ -14,6 +14,7 @@ const client = new OSS({
   accessKeyId,
   accessKeySecret,
   bucket,
+  timeout: 300000, // 5分钟
 });
 
 /**
@@ -29,10 +30,10 @@ async function uploadToOSS(localFilePath, ossDir = "videos/") {
   try {
     console.log("[uploadToOSS] 开始分片并发上传...");
     const start = Date.now();
-    // 分片并发上传，partSize=8MB，parallel=5
+    // 分片并发上传，partSize=5MB，parallel=5
     const result = await Promise.race([
       client.multipartUpload(ossPath, localFilePath, {
-        partSize: 8 * 1024 * 1024, // 8MB
+        partSize: 5 * 1024 * 1024, // 5MB
         parallel: 5,
         progress: (p) => {
           const percent = Math.floor(p * 100);

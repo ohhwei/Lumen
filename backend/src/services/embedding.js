@@ -45,28 +45,34 @@ class AliyunEmbeddingService {
   }
 
   /**
-   * 批量文本 embedding
+   * 批量文本 embedding（自动分批，每批最多10条）
    * @param {Array<string>} texts
    * @returns {Promise<Array<Array<number>>>}
    */
   async getBatchEmbeddings(texts) {
-    try {
-      const response = await axios.post(
-        this.apiUrl,
-        {
-          model: this.model,
-          input: texts,
-          dimensions: this.dimensions,
-          encoding_format: 'float'
-        },
-        { headers: this.headers }
-      );
-      // 返回 embedding 数组
-      return response.data.data.map(item => item.embedding);
-    } catch (error) {
-      console.error('Aliyun 批量Embedding生成失败:', error.response?.data || error.message);
-      throw new Error(`Aliyun 批量Embedding生成失败: ${error.response?.data?.error?.message || error.message}`);
+    const BATCH_SIZE = 10;
+    let allEmbeddings = [];
+    for (let i = 0; i < texts.length; i += BATCH_SIZE) {
+      const batch = texts.slice(i, i + BATCH_SIZE);
+      try {
+        const response = await axios.post(
+          this.apiUrl,
+          {
+            model: this.model,
+            input: batch,
+            dimensions: this.dimensions,
+            encoding_format: 'float'
+          },
+          { headers: this.headers }
+        );
+        const batchEmbeddings = response.data.data.map(item => item.embedding);
+        allEmbeddings = allEmbeddings.concat(batchEmbeddings);
+      } catch (error) {
+        console.error('Aliyun 批量Embedding生成失败:', error.response?.data || error.message);
+        throw new Error(`Aliyun 批量Embedding生成失败: ${error.response?.data?.error?.message || error.message}`);
+      }
     }
+    return allEmbeddings;
   }
 }
 

@@ -3,9 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "antd/dist/reset.css";
-import { Tabs, Card, Button } from "antd";
+import { Tabs, Card, Button, Divider } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { LeftOutlined } from "@ant-design/icons";
+
+const chineseNumbers = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
 
 export default function ResultPage() {
   const [selectedChapter, setSelectedChapter] = useState(0);
@@ -61,11 +63,17 @@ export default function ResultPage() {
   // 只认协议字段
   const deepseek = analysisResult?.deepseekResult || {};
   const summary = typeof deepseek.summary === "string" ? deepseek.summary : "";
-  const highlights = Array.isArray(deepseek.highlights)
-    ? deepseek.highlights
-    : [];
+  const highlights = Array.isArray(deepseek.highlights?.highlights)
+    ? deepseek.highlights.highlights
+    : Array.isArray(deepseek.highlights)
+      ? deepseek.highlights
+      : [];
   console.log("highlights", highlights);
-  const keywords = Array.isArray(deepseek.keywords) ? deepseek.keywords : [];
+  const keywords = Array.isArray(deepseek.keywords?.keywords)
+    ? deepseek.keywords.keywords
+    : Array.isArray(deepseek.keywords)
+      ? deepseek.keywords
+      : [];
   const learningGuide = {
     basic: Array.isArray(deepseek.learningGuide?.basic)
       ? deepseek.learningGuide.basic
@@ -135,64 +143,27 @@ export default function ResultPage() {
     deepseek?.title ||
     "未命名视频";
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
-        加载中...
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500 text-lg">
-        {error}
-      </div>
-    );
-  }
-  if (!analysisResult) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
-        暂无数据
-      </div>
-    );
-  }
-
-  function renderLearningGuideSection(section: string) {
-    // 1. 去除所有星号
-    const clean = section.replace(/\*/g, "");
-    // 2. 按行分割
-    const lines = clean.split("\n").filter((l) => l.trim());
-    return (
-      <div className="mb-4">
-        {lines.map((line, idx) => {
-          // 标题行（# 开头）
-          if (/^#+\s*(.+)/.test(line)) {
-            const title = line.replace(/^#+\s*/, "");
-            return (
-              <div key={idx} className="font-bold text-base mb-1">
-                {title}
-              </div>
-            );
-          }
-          // 分点（- 开头）
-          if (/^\-\s+(.+)/.test(line)) {
-            const point = line.replace(/^\-\s+/, "");
-            return (
-              <li key={idx} className="ml-6 list-disc text-gray-800">
-                {point}
-              </li>
-            );
-          }
-          // 普通文本
-          return (
-            <div key={idx} className="text-gray-800">
-              {line}
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
+  //       加载中...
+  //     </div>
+  //   );
+  // }
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center text-red-500 text-lg">
+  //       {error}
+  //     </div>
+  //   );
+  // }
+  // if (!analysisResult) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
+  //       暂无数据
+  //     </div>
+  //   );
+  // }
 
   const tabItems = [
     {
@@ -208,107 +179,118 @@ export default function ResultPage() {
             <div>
               <p className="text-body leading-relaxed">{summary}</p>
             </div>
-            <hr className="my-4" />
+            <Divider style={{ margin: "28px 0", borderColor: "#e5e7eb" }} />
             <div>
-              <h4 className="text-subtitle mb-2">亮点</h4>
+              <h4 className="text-subtitle mb-4">亮点</h4>
               <ul className="text-body space-y-2">
                 {highlights.map((item: any, idx: number) => (
-                  <li key={idx} className="flex items-start flex-col">
-                    <div className="text-body">
-                      <span className="text-blue-500 mr-2">•</span>
-                      <span className="text-body ">
-                        {item.highlight}
-                      </span>
-                    </div>
-                    <div className="text-secondary ml-2">
-                      {item.description}
-                    </div>
+                  <li key={idx} className="flex items-start">
+                    <span className="text-blue-500 mr-2">•</span>
+                    <span className="text-body">{item.description}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <hr className="my-4" />
+            <Divider style={{ margin: "28px 0", borderColor: "#e5e7eb" }} />
+            {/* 核心知识点 */}
             <div>
-              <h4 className="text-subtitle mb-4">学习指引</h4>
-              <div className="text-secondary">
-                <ul className="text-body space-y-2">
-                  <div className="font-bold" style={{ color: "green" }}>
-                    初学者路径
+              <h3 className="text-subtitle mb-4">核心知识点</h3>
+              <div className="space-y-6">
+                {knowledgePoints.map((point: any, index: number) => (
+                  <div key={index}>
+                    <h4 className="text-body font-bold mb-1 flex items-center">
+                      <span className="text-blue-500 mr-2">•</span>
+                      {point.name}
+                    </h4>
+                    <p className="text-body leading-relaxed mb-2">
+                      {point.description}
+                    </p>
+                    {point.prerequisites && point.prerequisites.length > 0 && (
+                      <div className="text-secondary mb-2">
+                        前置知识点：{point.prerequisites.join("、")}
+                      </div>
+                    )}
+                    {index < knowledgePoints.length - 1 }
                   </div>
-                  <li className="flex items-start flex-col">
-                    <div>{deepseek.learningGuide?.basic[0].theme}</div>
-                    <div className="text-secondary ml-2">
-                      {deepseek.learningGuide?.basic[0].description}
-                    </div>
-                  </li>
-                  <div className="font-bold" style={{ color: "blue" }}>
-                    进阶学习
-                  </div>
-                  <li className="flex items-start flex-col">
-                    <div>{deepseek.learningGuide?.intermediate[0].theme}</div>
-                    <div className="text-secondary ml-2">
-                      {deepseek.learningGuide?.intermediate[0].description}
-                    </div>
-                  </li>
-                  <div className="font-bold" style={{ color: "purple" }}>
-                    高级应用
-                  </div>
-                  <li className="flex items-start flex-col">
-                    <div>{deepseek.learningGuide?.advanced[0].theme}</div>
-                    <div className="text-secondary ml-2">
-                      {deepseek.learningGuide?.advanced[0].description}
-                    </div>
-                  </li>
-                </ul>
+                ))}
               </div>
             </div>
-            <hr className="my-4" />
           </div>
         </div>
       ),
     },
     {
-      key: "knowledge",
-      label: "知识点",
+      key: "studyGuide",
+      label: "学习指引",
       children: (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-subtitle mb-6">核心知识点</h3>
-          <div className="space-y-6">
-            {knowledgePoints.map((point: any, index: number) => (
-              <div key={index}>
-                <h4 className="text-body font-bold mb-2">{point.name}</h4>
-                <p className="text-body leading-relaxed mb-2">
-                  {point.description}
-                </p>
-                {point.prerequisites && point.prerequisites.length > 0 && (
-                  <div className="text-secondary mb-2">
-                    前置知识点：{point.prerequisites.join("、")}
-                  </div>
-                )}
-                {index < knowledgePoints.length - 1 && <hr className="my-4" />}
-              </div>
-            ))}
-            <hr className="my-6" />
-            <div>
-              <h4 className="text-subtitle mb-4">参考资料</h4>
-              <div className="space-y-3">
-                {analysisResult.status !== "done" ? (
-                  <div className="animate-pulse bg-gray-100 h-12 rounded mb-2" />
-                ) : (
-                  <div className="space-y-3">
-                    {references.map((ref: any, index: number) => (
+          {/* 学习指引 */}
+          <div>
+            <h4 className="text-subtitle mb-4">学习指引</h4>
+            <div className="text-secondary">
+              <ul className="text-body space-y-6">
+                {Array.isArray(deepseek.learningGuide) &&
+                  deepseek.learningGuide.map((stage: any, idx: number) => (
+                    <li key={idx} className="mb-4">
+                      <div className="font-bold text-body mb-1">
+                        {`阶段${chineseNumbers[idx] || idx + 1}：${stage.theme}`}
+                      </div>
+                      <div className="text-body text-sm mb-1">
+                        目标：{stage.goal.trim().replace(/[。.]?$/, "。")}
+                      </div>
+                      <ul className="ml-4 space-y-1">
+                        {Array.isArray(stage.guide) &&
+                          stage.guide.map((point: string, i: number) => (
+                            <li key={i} className="flex items-start">
+                              <span className="text-blue-500 mr-2">•</span>
+                              <span className="text-body">
+                                {point.trim().replace(/[。.]?$/, "。")}
+                              </span>
+                            </li>
+                          ))}
+                      </ul>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </div>
+          <Divider style={{ margin: "28px 0", borderColor: "#e5e7eb" }} />
+          {/* 参考资料 */}
+          <div>
+            <h4 className="text-subtitle mb-4">参考资料</h4>
+            <div className="space-y-3">
+              {analysisResult.status !== "done" ? (
+                <div className="animate-pulse bg-gray-100 h-12 rounded mb-2" />
+              ) : (
+                <div className="space-y-3">
+                  {references.map((ref: any, index: number) => (
+                    <div
+                      key={index}
+                      className="bg-gray-50 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition"
+                      onClick={() => {
+                        if (ref.url) {
+                          window.open(ref.url, "_blank");
+                        }
+                      }}
+                    >
+                      {/* 标题：最多两行，超出省略 */}
                       <div
-                        key={index}
-                        className="bg-gray-50 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition"
-                        onClick={() => {
-                          if (ref.url) {
-                            window.open(ref.url, "_blank");
-                          }
+                        className="text-body"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          wordBreak: "break-all",
                         }}
                       >
-                        {/* 标题：最多两行，超出省略 */}
+                        {ref.title || "参考资料"}
+                      </div>
+                      {/* 作者：最多两行，超出省略，不显示“作者：” */}
+                      {ref.author && (
                         <div
-                          className="text-body"
+                          className="text-secondary mt-1"
                           style={{
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
@@ -316,32 +298,16 @@ export default function ResultPage() {
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             wordBreak: "break-all",
+                            fontSize: 13,
                           }}
                         >
-                          {ref.title || "参考资料"}
+                          {ref.author}
                         </div>
-                        {/* 作者：最多两行，超出省略，不显示“作者：” */}
-                        {ref.author && (
-                          <div
-                            className="text-secondary mt-1"
-                            style={{
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              wordBreak: "break-all",
-                              fontSize: 13,
-                            }}
-                          >
-                            {ref.author}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -495,6 +461,7 @@ export default function ResultPage() {
                 )}
               </div>
             </div>
+            <Divider style={{ margin: "28px 0", borderColor: "#e5e7eb" }} />
             {/* 简答题 */}
             <div>
               <h4 className="text-subtitle mb-4">简答题</h4>
@@ -592,11 +559,6 @@ export default function ResultPage() {
         <div style={{ width: 40 }} />
       </header>
 
-      {/* 在导航栏或主内容区上方插入标题 */}
-      {/* <div className="w-full text-xl font-bold text-gray-900 mb-6 text-center">
-        {videoTitle}
-      </div> */}
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-8 gap-6">
           {/* 左侧 - 视频和章节 */}
@@ -658,7 +620,7 @@ export default function ResultPage() {
                       }`}
                       style={{
                         background:
-                          selectedChapter === index ? "#f5f5f6" : "#fff",
+                          selectedChapter === index ? "#f3f4f6" : "#fff",
                         borderColor:
                           selectedChapter === index ? "#3b82f6" : "#e5e7eb",
                         borderWidth: selectedChapter === index ? 2 : 1,
@@ -706,7 +668,7 @@ export default function ResultPage() {
                 className="rounded-lg mt-6"
                 style={{ marginLeft: 20, marginRight: 20 }}
               >
-                <h4 className="text-subtitle mb-2">
+                <h4 className="text-subtitle mb-4">
                   {chapters[selectedChapter]?.title}
                   <span className="text-secondary ml-2">
                     {chapters[selectedChapter]?.time}
