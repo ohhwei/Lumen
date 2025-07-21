@@ -50,43 +50,27 @@ export default function HomePage() {
   const recommendedVideos = [
     {
       id: 1,
-      title: "深度学习基础教程",
-      cover: "/placeholder.svg?height=120&width=200",
-      desc: "本课程详细讲解机器学习中的线性回归、梯度下降等核心算法，适合初学者入门。",
+      title: "Attention is all you need 论文解读及Transformer架构详细介绍",
+      cover: "/cover1.jpg",
+      desc: "该论文是现代大语言模型的基石，其核心创新在于Transformer架构和自注意力机制。",
       source: "Bilibili",
-      url: "https://www.bilibili.com/video/BV1example1",
+      url: "https://www.bilibili.com/video/BV1xoJwzDESD/?spm_id_from=333.1391.0.0&vd_source=954fddf33ed009a89f941d3a79947c59",
     },
     {
       id: 2,
-      title: "机器学习算法详解",
-      cover: "/placeholder.svg?height=120&width=200",
-      desc: "本课程详细讲解机器学习中的线性回归、梯度下降等核心算法，适合初学者入门。",
-      source: "Youtube",
-      url: "https://www.youtube.com/watch?v=example2",
+      title: "万字科普GPT4为何会颠覆现有工作流；为何你要关注微软Copilot、文心一言等大模型",
+      cover: "/cover2.jpg",
+      desc: "视频深入探讨了ChatGPT-4的核心原理、训练阶段及其对社会的潜在颠覆性影响。",
+      source: "Bilibili",
+      url: "https://www.bilibili.com/video/BV1MY4y1R7EN/?spm_id_from=333.337.search-card.all.click&vd_source=954fddf33ed009a89f941d3a79947c59",
     },
     {
       id: 3,
-      title: "Python数据分析实战",
-      cover: "/placeholder.svg?height=120&width=200",
-      desc: "本课程详细讲解机器学习中的线性回归、梯度下降等核心算法，适合初学者入门。",
+      title: "万字科普DeepSeek R1底层原理，DeepSeek是从0到1的创新吗？",
+      cover: "/cover3.jpg",
+      desc: "视频由浅入深的为你解释DeepSeek R1的技术路线，让你明白DeepSeek和OpenAI的差别到底在哪里？",
       source: "Bilibili",
-      url: "https://www.bilibili.com/video/BV1example3",
-    },
-    {
-      id: 4,
-      title: "人工智能前沿技术",
-      cover: "/placeholder.svg?height=120&width=200",
-      desc: "本课程详细讲解机器学习中的线性回归、梯度下降等核心算法，适合初学者入门。",
-      source: "Youtube",
-      url: "https://www.youtube.com/watch?v=example4",
-    },
-    {
-      id: 5,
-      title: "计算机视觉入门",
-      cover: "/placeholder.svg?height=120&width=200",
-      desc: "本课程详细讲解机器学习中的线性回归、梯度下降等核心算法，适合初学者入门。",
-      source: "Bilibili",
-      url: "https://www.bilibili.com/video/BV1example5",
+      url: "https://www.bilibili.com/video/BV1cV93YGEoy/?spm_id_from=333.337.search-card.all.click&vd_source=954fddf33ed009a89f941d3a79947c59",
     },
   ]
 
@@ -182,7 +166,12 @@ export default function HomePage() {
       <header className="w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
           <div className="flex items-center">
-            <div className="text-xl font-bold text-blue-600">AI视频学习助手</div>
+            <img
+              src="/logo.png"
+              alt="logo"
+              className="h-12 w-auto"
+              style={{ display: "block" }}
+            />
           </div>
           <div className="flex items-center space-x-4">
             <Button type="text" onClick={() => setFeedbackVisible(true)}>
@@ -210,7 +199,7 @@ export default function HomePage() {
         {/* 标题区 */}
         <div className="text-center mb-10">
             <h1 className="text-4xl font-bold text-gray-900 mb-6 gradient-text">AI视频学习助手</h1>
-            <p className="text-xl text-gray-600 mb-8 gradient-text opacity-80">穿过繁杂信息，构建知识网络，让每一次观看成为真正的理解</p>
+            <p className="text-xl text-gray-600 mb-6 gradient-text opacity-80">穿过繁杂信息，构建知识网络，让每一次观看成为真正的理解</p>
         </div>
 
         {/* 输入区 */}
@@ -219,7 +208,7 @@ export default function HomePage() {
           <input
             type="text"
               className="w-full h-14 px-6 text-lg rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 input-placeholder-14"
-              placeholder="请输入视频链接如：Bilibili 或 YouTube"
+              placeholder="推荐请输入 Bilibili 视频链接"
             value={videoUrl}
             onChange={handleUrlChange}
             style={{ width: 720 }}
@@ -258,7 +247,7 @@ export default function HomePage() {
         {/* 推荐区 */}
         <div className="flex justify-center items-center gap-8">
           {/* 左按钮 */}
-          <button
+          {/* <button
             className={`
               w-10 h-10 flex items-center justify-center rounded-full
               bg-transparent
@@ -274,7 +263,7 @@ export default function HomePage() {
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M15 18l-6-6 6-6"/>
             </svg>
-          </button>
+          </button> */}
 
           {/* 卡片区 */}
           <div className="flex gap-8">
@@ -301,7 +290,7 @@ export default function HomePage() {
                   </div>
                   {/* 简介 */}
                   <div
-                      className="text-secondary text-sm mb-1"
+                      className="text-secondary text-sm mb-2"
                     style={{
                         fontSize: 13,
                       display: '-webkit-box',
@@ -330,9 +319,8 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-
-          {/* 右按钮 */}
-          <button
+         {/* 右按钮 */}
+          {/* <button
             className={`
               w-10 h-10 flex items-center justify-center rounded-full
               bg-transparent
@@ -348,7 +336,7 @@ export default function HomePage() {
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 6l6 6-6 6"/>
             </svg>
-          </button>
+          </button> */}
           </div>
         </div>
       </main>

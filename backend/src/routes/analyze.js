@@ -297,9 +297,9 @@ router.post("/", async (req, res) => {
       );
 
       const transcript = transcripts.join("\n");
-      // const ragUtils = new RAGUtils();
-      // const chunks = sentenceChunk(transcript, 400, 50);
-      // await ragUtils.processTranscriptChunks(chunks);
+      const ragUtils = new RAGUtils();
+      const chunks = sentenceChunk(transcript, 400, 50);
+      await ragUtils.processTranscriptChunks(chunks);
 
       console.log(`[分析任务] [${taskId}] 完成ASR转写 + 文本拼接`);
 
@@ -474,88 +474,6 @@ router.get("/progress", (req, res) => {
     },
   });
 });
-
-// ========== 新增：只生成摘要和关键词的测试接口 ==========
-router.post("/summary-keywords-test", async (req, res) => {
-  try {
-    const { url } = req.body;
-    if (!url) return res.status(400).json({ error: "缺少视频链接" });
-
-    // 1. 校验和直链解析（与主流程一致）
-    const meta = await validateVideoUrl(url);
-    let realVideoUrl = url;
-    let audioUrl = null;
-    if (url.includes("bilibili.com/video/BV")) {
-      const bvidMatch = url.match(/BV[\w]+/);
-      if (bvidMatch) {
-        const bvid = bvidMatch[0];
-        const resp = await axios.post(
-          "http://localhost:5050/api/analyze/parse/bilibili",
-          { bvid }
-        );
-        if (resp.data.success) {
-          realVideoUrl = resp.data.videoUrl;
-          audioUrl = resp.data.audioUrl;
-        } else {
-          return res.status(400).json({
-            error: "B站直链解析失败: " + (resp.data.error || "未知错误"),
-          });
-        }
-      }
-    }
-    const ossPath = `videos/test_${Date.now()}.mp4`;
-    // 2. 下载/上传
-    const { audioPath, videoPath } = await downloadAndUploadToOSS(
-      realVideoUrl,
-      audioUrl,
-      ossPath
-    );
-    // 3. 音频分片
-    const audioParts = splitAudio(audioPath, 300);
-    // 4. 上传分片到OSS
-    const ossDir = "videos/";
-    async function uploadAndClean(file) {
-      try {
-        const ossUrl = await uploadToOSS(file, ossDir);
-        try {
-          fs.unlinkSync(file);
-        } catch (e) {}
-        return ossUrl;
-      } catch (err) {
-        return null;
-      }
-    }
-    const uploadResults = await Promise.all(audioParts.map(uploadAndClean));
-    const audioPartsOSS = uploadResults.filter(Boolean);
-    // 5. ASR转写
-    const asrTaskIds = await Promise.all(
-      audioPartsOSS.map((url) => submitAsrTask(url))
-    );
-    async function pollAsrResult(taskId) {
-      let result = null,
-        retry = 0;
-      while (!result && retry < 60) {
-        await new Promise((r) => setTimeout(r, 10000));
-        result = await getAsrResult(taskId);
-        retry++;
-      }
-      if (!result) throw new Error("腾讯云转写超时");
-      return result?.Result || "";
-    }
-    const transcripts = await Promise.all(
-      asrTaskIds.map((id) => pollAsrResult(id))
-    );
-    const transcript = transcripts.join("\n");
-    // 6. 只生成摘要和关键词
-    const summary = await analyzeWithDeepSeek(transcript, "normal.summary");
-    const keywords = await analyzeWithDeepSeek(transcript, "normal.keywords");
-    res.json({ success: true, summary, keywords });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message });
-  }
-});
-
-module.exports = router;
 
 // 工具函数：容错 JSON 解析
 function safeJson(str) {

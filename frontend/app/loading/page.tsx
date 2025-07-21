@@ -5,12 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Progress, Button, Modal } from "antd";
 
 export default function LoadingPage() {
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(8); // 默认8%
   const [steps, setSteps] = useState<any[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
-  const [videoTitle, setVideoTitle] = useState<string>("");
   const router = useRouter();
   const searchParams = useSearchParams();
   const url = searchParams?.get("url");
@@ -54,20 +53,18 @@ export default function LoadingPage() {
 
   // 轮询后端进度API
   useEffect(() => {
-    // 1. 从 URL 获取 taskId
     const searchParams = new URLSearchParams(window.location.search);
     const tid = searchParams.get("taskId");
     if (!tid) return;
     setTaskId(tid);
     const timer = setInterval(async () => {
-      console.log("轮询进度", tid);
       const res = await fetch(`/api/analyze/progress?taskId=${tid}`);
       const data = await res.json();
       if (data.success && data.data) {
-        setProgress(data.data.percent || 0);
+        // 只要后端进度大于8%，就用真实进度，否则保持8%
+        setProgress(data.data.percent > 8 ? data.data.percent : 8);
         setSteps(data.data.steps || []);
         setCurrentStep(data.data.currentStep || 0);
-        setVideoTitle(data.data.videoTitle || "");
         if (data.data.error) {
           setError(data.data.error.message);
           clearInterval(timer);
@@ -78,7 +75,6 @@ export default function LoadingPage() {
             onOk: () => router.push("/"),
           });
         }
-        // 只有所有步骤都 done 或 status: 'done' 时才跳转
         if (
           (data.data.steps &&
             data.data.steps.length > 0 &&
@@ -95,16 +91,20 @@ export default function LoadingPage() {
     return () => clearInterval(timer);
   }, [router]);
 
-  // 移除基于 percent==100 或单步完成的跳转
+  // 只显示当前步骤文本
+  const currentStepText =
+    steps.length > 0 && currentStep > 0
+      ? steps[currentStep - 1]?.name
+      : "准备中...";
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50">
       <div className="flex flex-col items-center w-full max-w-md">
-        <div className="text-2xl font-bold text-gray-900 mb-2">
-          {videoTitle ? `正在分析：${videoTitle}` : "正在分析视频内容"}
+        <div className="text-2xl font-bold text-gray-900 mb-4 text-center">
+          正在分析视频内容
         </div>
-        <div className="text-gray-500 mb-8">
-          请稍候，我们正在为您提取和分析视频中的知识点…
+        <div className="text-gray-500 mb-8 text-center">
+          请稍候1~3分钟，AI正在为您提取和解析视频中的知识点…
         </div>
         <Progress
           percent={progress}
@@ -117,35 +117,9 @@ export default function LoadingPage() {
           <span>{Math.round(progress)}%</span>
           <span>100%</span>
         </div>
-        <div className="w-full mb-4">
-          {steps.length > 0 && (
-            <ul className="space-y-1">
-              {steps.map((step, idx) => (
-                <li
-                  key={idx}
-                  className={
-                    idx === currentStep - 1
-                      ? "font-bold text-blue-600"
-                      : step.status === "done"
-                      ? "text-green-600"
-                      : step.status === "error"
-                      ? "text-red-500"
-                      : "text-gray-600"
-                  }
-                >
-                  <span>{step.name}</span>
-                  {step.detail && (
-                    <span className="ml-2 text-xs text-gray-400">
-                      {step.detail}
-                    </span>
-                  )}
-                  {step.status === "error" && (
-                    <span className="ml-2">（失败，正在重试…）</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
+        {/* 当前步骤，居中展示 */}
+        <div className="w-full flex justify-center items-center mb-8">
+          <span className="text-lg text-gray-600">{currentStepText}</span>
         </div>
         <Button
           type="text"

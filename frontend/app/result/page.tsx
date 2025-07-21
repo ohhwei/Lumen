@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "antd/dist/reset.css";
-import { Tabs, Card } from "antd";
+import { Tabs, Card, Button } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { LeftOutlined } from "@ant-design/icons";
 
 export default function ResultPage() {
   const [selectedChapter, setSelectedChapter] = useState(0);
@@ -215,7 +216,7 @@ export default function ResultPage() {
                   <li key={idx} className="flex items-start flex-col">
                     <div className="text-body">
                       <span className="text-blue-500 mr-2">•</span>
-                      <span className="text-body font-bold">
+                      <span className="text-body ">
                         {item.highlight}
                       </span>
                     </div>
@@ -271,11 +272,11 @@ export default function ResultPage() {
       label: "知识点",
       children: (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-title mb-6">核心知识点</h3>
+          <h3 className="text-subtitle mb-6">核心知识点</h3>
           <div className="space-y-6">
             {knowledgePoints.map((point: any, index: number) => (
               <div key={index}>
-                <h4 className="text-subtitle mb-2">{point.name}</h4>
+                <h4 className="text-body font-bold mb-2">{point.name}</h4>
                 <p className="text-body leading-relaxed mb-2">
                   {point.description}
                 </p>
@@ -294,24 +295,51 @@ export default function ResultPage() {
                 {analysisResult.status !== "done" ? (
                   <div className="animate-pulse bg-gray-100 h-12 rounded mb-2" />
                 ) : (
-                  references.map((ref: any, index: number) => (
-                    <div
-                      key={index}
-                      className="bg-gray-50 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition"
-                      onClick={() => {
-                        if (ref.url) {
-                          window.open(ref.url, "_blank");
-                        }
-                      }}
-                    >
-                      <div className="text-body">{ref.title || "参考资料"}</div>
-                      {ref.author && (
-                        <div className="text-secondary mt-1">
-                          作者：{ref.author}
+                  <div className="space-y-3">
+                    {references.map((ref: any, index: number) => (
+                      <div
+                        key={index}
+                        className="bg-gray-50 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition"
+                        onClick={() => {
+                          if (ref.url) {
+                            window.open(ref.url, "_blank");
+                          }
+                        }}
+                      >
+                        {/* 标题：最多两行，超出省略 */}
+                        <div
+                          className="text-body"
+                          style={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            wordBreak: "break-all",
+                          }}
+                        >
+                          {ref.title || "参考资料"}
                         </div>
-                      )}
-                    </div>
-                  ))
+                        {/* 作者：最多两行，超出省略，不显示“作者：” */}
+                        {ref.author && (
+                          <div
+                            className="text-secondary mt-1"
+                            style={{
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              wordBreak: "break-all",
+                              fontSize: 13,
+                            }}
+                          >
+                            {ref.author}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -324,10 +352,6 @@ export default function ResultPage() {
       label: "测一测",
       children: (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-title">练习题目</h3>
-          </div>
-          {/* 直接渲染 questions 内容，无需判断 questionsLoading */}
           <div className="space-y-8">
             {/* 选择题 */}
             <div>
@@ -546,12 +570,16 @@ export default function ResultPage() {
     <div className="min-h-screen bg-gray-50">
       {/* 导航栏 */}
       <header
-        className="w-full flex items-center justify-between px-4 border-b bg-white"
+        className="w-full flex items-center px-4 border-b bg-white"
         style={{ height: 56, minHeight: 56 }}
       >
-        <button onClick={() => router.push("/")} className="btn-text text-sm">
-          ← 返回主页
-        </button>
+        <Button
+          type="text"
+          icon={<LeftOutlined style={{ color: "#888" }} />}
+          onClick={() => router.push("/")}
+          style={{ fontSize: 20, paddingLeft: 0 }}
+          className="flex items-center"
+        />
         <div className="flex-1 text-center">
           <span
             className="text-title truncate max-w-xl inline-block align-middle"
@@ -560,7 +588,8 @@ export default function ResultPage() {
             {videoTitle}
           </span>
         </div>
-        <div style={{ width: 80 }} />
+        {/* 右侧占位可选 */}
+        <div style={{ width: 40 }} />
       </header>
 
       {/* 在导航栏或主内容区上方插入标题 */}
@@ -629,9 +658,9 @@ export default function ResultPage() {
                       }`}
                       style={{
                         background:
-                          selectedChapter === index ? "#f3f4f6" : "#fff",
+                          selectedChapter === index ? "#f5f5f6" : "#fff",
                         borderColor:
-                          selectedChapter === index ? "#3981ee" : "#e5e7eb",
+                          selectedChapter === index ? "#3b82f6" : "#e5e7eb",
                         borderWidth: selectedChapter === index ? 2 : 1,
                         boxShadow: "none",
                         margin: 0,
@@ -698,7 +727,19 @@ export default function ResultPage() {
               type="card"
               items={tabItems.map((item) => ({
                 ...item,
-                label: item.label,
+                label: (
+                  <span
+                    className={tab === item.key ? "gradient-text font-bold" : ""}
+                    style={{
+                      padding: "0 24px",
+                      display: "inline-block",
+                      minWidth: 80,
+                      textAlign: "center",
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                ),
               }))}
               style={{ width: "100%" }}
               tabBarGutter={0}
