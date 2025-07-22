@@ -20,6 +20,7 @@ export default function ResultPage() {
   }>({});
   const router = useRouter();
   const searchParams = useSearchParams();
+  const taskId = searchParams?.get("taskId");
   const [tab, setTab] = useState("summary");
 
   // 后端数据
@@ -28,7 +29,6 @@ export default function ResultPage() {
   const [error, setError] = useState("");
 
   // 获取 taskId
-  const taskId = searchParams?.get("taskId");
   useEffect(() => {
     if (!taskId) {
       setError("未提供任务ID");

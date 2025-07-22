@@ -19,6 +19,9 @@ const { searchCrossRef } = require("../services/referenceSearch");
 // 全局进度存储（生产建议用Redis等持久化方案）
 const progressMap = {};
 
+// 案例缓存对象，key为caseId，value为解析内容
+const caseCache = {};
+
 // 在文件顶部定义标准步骤
 const STANDARD_STEPS = [
   { name: "视频下载中", status: "pending", detail: "" },
@@ -115,7 +118,13 @@ router.post("/parse/bilibili", async (req, res) => {
 
 // 1. 用户提交视频链接，自动触发全流程
 router.post("/", async (req, res) => {
-  const { url } = req.body;
+  const { url, caseId } = req.body;
+
+  // 1. 如果是案例且缓存命中，直接返回
+  if (caseId && caseCache[caseId]) {
+    return res.json({ success: true, taskId: caseCache[caseId].taskId });
+  }
+
   if (!url) return res.status(400).json({ error: "缺少视频链接" });
 
   // 新增：获取视频标题
@@ -159,6 +168,15 @@ router.post("/", async (req, res) => {
   };
   console.log(`[分析任务] 新任务启动, taskId: ${taskId}, url: ${url}`);
   res.json({ success: true, taskId }); // 立即返回taskId
+
+  // 2. 如果是案例，分析流程结束后写入缓存
+  // 在分析流程最后一步（任务全部完成后），加上：
+  if (caseId) {
+    caseCache[caseId] = {
+      taskId, // 记录 taskId，后续可用
+      // 你也可以存更多内容，比如 result
+    };
+  }
 
   // 后台异步处理
   (async () => {

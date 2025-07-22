@@ -105,8 +105,23 @@ export default function HomePage() {
     // setLoading(false);   // 如果有 loading 状态
   };
 
-  const handleRecommendClick = (video: any) => {
-    router.push(`/result?id=${video.id}`)
+  const handleRecommendClick = async (video: any) => {
+    // 推荐案例直接发起分析请求，带上 caseId 和 url
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: video.url, caseId: video.id }),
+      });
+      const data = await res.json();
+      if (data.taskId) {
+        router.push(`/loading?taskId=${data.taskId}`);
+      } else {
+        message.error(data.error || '提交失败');
+      }
+    } catch (e) {
+      message.error('网络错误');
+    }
   }
 
   const handlePrevRecommend = () => {
