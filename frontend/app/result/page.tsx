@@ -644,10 +644,14 @@ export default function ResultPage() {
                         height: "100%",
                       }}
                     >
-                      <div className="text-body chapter-title truncate" style={{ maxWidth: "100%" }}>
-                        {chapter.title}
+                      <div>
+                        <div className="text-body chapter-title truncate" style={{ maxWidth: "100%" }}>
+                          {chapter.title}
+                        </div>
+                        <div className="text-secondary" style={{ marginTop: 1}}>
+                          {chapter.time}
+                        </div>
                       </div>
-                      <div className="text-secondary">{chapter.time}</div>
                     </Card>
                   ))}
                 </div>
@@ -673,7 +677,7 @@ export default function ResultPage() {
               </div>
               {/* 当前章节信息 */}
               <div
-                className="rounded-lg mt-6"
+                className="rounded-lg mt-4"
                 style={{ marginLeft: 20, marginRight: 20 }}
               >
                 <h4 className="font-bold text-body mb-2">
