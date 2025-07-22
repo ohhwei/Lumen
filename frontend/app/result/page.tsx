@@ -170,7 +170,7 @@ export default function ResultPage() {
       key: "summary",
       label: "视频总结",
       children: (
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6 h-[688px] overflow-y-auto">
           {/* 原 summary 区块内容 */}
           <div className="flex justify-between items-center mb-1">
             <h4 className="text-subtitle">摘要</h4>
@@ -223,7 +223,7 @@ export default function ResultPage() {
       key: "studyGuide",
       label: "学习指引",
       children: (
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6 h-[688px] overflow-y-auto">
           {/* 学习指引 */}
           <div>
             <h4 className="text-subtitle mb-4">学习指引</h4>
@@ -263,7 +263,7 @@ export default function ResultPage() {
                 <div className="animate-pulse bg-gray-100 h-12 rounded mb-2" />
               ) : (
                 <div className="space-y-3">
-                  {references.map((ref: any, index: number) => (
+                  {references.slice(0, 3).map((ref: any, index: number) => (
                     <div
                       key={index}
                       className="bg-gray-50 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition"
@@ -317,7 +317,7 @@ export default function ResultPage() {
       key: "quiz",
       label: "测一测",
       children: (
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6 h-[688px] overflow-y-auto">
           <div className="space-y-8">
             {/* 选择题 */}
             <div>
