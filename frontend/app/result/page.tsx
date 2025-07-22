@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "antd/dist/reset.css";
@@ -9,7 +10,8 @@ import { LeftOutlined } from "@ant-design/icons";
 
 const chineseNumbers = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
 
-export default function ResultPage() {
+// 新增内部组件，原有内容全部移到这里
+function InnerResultPage() {
   const [selectedChapter, setSelectedChapter] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: number]: string;
@@ -63,11 +65,13 @@ export default function ResultPage() {
   // 只认协议字段
   const deepseek = analysisResult?.deepseekResult || {};
   const summary = typeof deepseek.summary === "string" ? deepseek.summary : "";
-  const highlights = Array.isArray(deepseek.highlights?.highlights)
-    ? deepseek.highlights.highlights
-    : Array.isArray(deepseek.highlights)
-      ? deepseek.highlights
-      : [];
+  const highlights = Array.isArray(deepseek.highlights?.content_highlights)
+    ? deepseek.highlights.content_highlights
+    : Array.isArray(deepseek.highlights?.highlights)
+      ? deepseek.highlights.highlights
+      : Array.isArray(deepseek.highlights)
+        ? deepseek.highlights
+        : [];
   console.log("highlights", highlights);
   const keywords = Array.isArray(deepseek.keywords?.keywords)
     ? deepseek.keywords.keywords
@@ -723,5 +727,14 @@ export default function ResultPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 页面默认导出只负责 Suspense 包裹
+export default function ResultPage() {
+  return (
+    <Suspense fallback={<div>加载中...</div>}>
+      <InnerResultPage />
+    </Suspense>
   );
 }

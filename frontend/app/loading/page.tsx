@@ -1,10 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Progress, Button, Modal } from "antd";
 
-export default function LoadingPage() {
+// 新增内部组件，原有内容全部移到这里
+function InnerLoadingPage() {
   const [progress, setProgress] = useState(8); // 默认8%
   const [steps, setSteps] = useState<any[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
@@ -130,5 +132,14 @@ export default function LoadingPage() {
         </Button>
       </div>
     </div>
+  );
+}
+
+// 页面默认导出只负责 Suspense 包裹
+export default function LoadingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <InnerLoadingPage />
+    </Suspense>
   );
 }
