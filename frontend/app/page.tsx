@@ -58,17 +58,17 @@ export default function HomePage() {
     },
     {
       id: 2,
-      title: "万字科普GPT4为何会颠覆现有工作流；为何你要关注微软Copilot、文心一言等大模型",
+      title: "GPT4为何会颠覆现有工作流，为何你要关注微软Copilot、文心一言等大模型",
       cover: "/cover2.jpg",
-      desc: "视频深入探讨了ChatGPT-4的核心原理、训练阶段及其对社会的潜在颠覆性影响。",
+      desc: "深入探讨ChatGPT-4的核心原理、训练阶段及其对社会的潜在颠覆性影响。",
       source: "Bilibili",
       url: "https://www.bilibili.com/video/BV1MY4y1R7EN/?spm_id_from=333.337.search-card.all.click&vd_source=954fddf33ed009a89f941d3a79947c59",
     },
     {
       id: 3,
-      title: "万字科普DeepSeek R1底层原理，DeepSeek是从0到1的创新吗？",
+      title: "DeepSeek R1底层原理，是从0到1的创新吗？",
       cover: "/cover3.jpg",
-      desc: "视频由浅入深的为你解释DeepSeek R1的技术路线，让你明白DeepSeek和OpenAI的差别到底在哪里？",
+      desc: "由浅入深的为你解释DeepSeek R1的技术路线，让你明白DeepSeek和OpenAI的差别到底在哪里？",
       source: "Bilibili",
       url: "https://www.bilibili.com/video/BV1cV93YGEoy/?spm_id_from=333.337.search-card.all.click&vd_source=954fddf33ed009a89f941d3a79947c59",
     },
@@ -198,8 +198,8 @@ export default function HomePage() {
         <div className="w-full">
         {/* 标题区 */}
         <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-gray-900 mb-6 gradient-text">AI视频学习助手</h1>
-            <p className="text-xl text-gray-600 mb-6 gradient-text opacity-80">穿过繁杂信息，构建知识网络，让每一次观看成为真正的理解</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-6 gradient-text">知识类视频 AI 转译官</h1>
+            <p className="text-xl text-gray-600 mb-6 gradient-text opacity-80">穿过繁杂信息，构建知识网络，让每次观看都成为真正的理解</p>
         </div>
 
         {/* 输入区 */}
@@ -208,7 +208,7 @@ export default function HomePage() {
           <input
             type="text"
               className="w-full h-14 px-6 text-lg rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 input-placeholder-14"
-              placeholder="推荐请输入 Bilibili 视频链接"
+              placeholder="粘贴你想理解的 Bilibili 视频链接"
             value={videoUrl}
             onChange={handleUrlChange}
             style={{ width: 720 }}
@@ -356,7 +356,7 @@ export default function HomePage() {
         cancelText="取消"
       >
         <div className="mb-6">
-          <label className="block font-medium mb-3">反馈意见 <span className="text-red-500">*</span></label>
+          <label className="block font-medium mb-3">你的反馈建议 <span className="text-red-500">*</span></label>
         <Input.TextArea
           value={feedbackText}
             onChange={e => {
@@ -365,7 +365,7 @@ export default function HomePage() {
             }}
           maxLength={200}
             rows={4}
-            placeholder="请输入您的反馈意见"
+            placeholder="请输入您的反馈建议"
           showCount
             required
           />

@@ -143,27 +143,27 @@ export default function ResultPage() {
     deepseek?.title ||
     "未命名视频";
 
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
-  //       加载中...
-  //     </div>
-  //   );
-  // }
-  // if (error) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center text-red-500 text-lg">
-  //       {error}
-  //     </div>
-  //   );
-  // }
-  // if (!analysisResult) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
-  //       暂无数据
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
+        加载中...
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 text-lg">
+        {error}
+      </div>
+    );
+  }
+  if (!analysisResult) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
+        暂无数据
+      </div>
+    );
+  }
 
   const tabItems = [
     {
@@ -496,11 +496,11 @@ export default function ResultPage() {
                       {showEssayAnswers[idx] && (
                         <div
                           className="mt-4 rounded-lg p-4 flex flex-col text-body bg-gray-50"
-                          style={{ borderLeft: "4px solid #2563eb" }}
+                          style={{ borderLeft: "4px solid #3b82f6" }}
                         >
                           <div
                             className="mb-2"
-                            style={{ fontWeight: 600, color: "#2563eb" }}
+                            style={{ fontWeight: 600, color: "#3b82f6" }}
                           >
                             参考答案
                           </div>
@@ -540,16 +540,17 @@ export default function ResultPage() {
         className="w-full flex items-center px-4 border-b bg-white"
         style={{ height: 56, minHeight: 56 }}
       >
-        <Button
-          type="text"
-          icon={<LeftOutlined style={{ color: "#888" }} />}
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className="h-12 w-auto cursor-pointer"
           onClick={() => router.push("/")}
-          style={{ fontSize: 20, paddingLeft: 0 }}
-          className="flex items-center"
+          style={{ marginRight: 20, marginLeft: 16 }}
         />
-        <div className="flex-1 text-center">
+        <div className="flex items-center" style={{ flex: 1 }}>
           <span
-            className="text-title inline-block align-middle"
+            className="text-title align-middle"
+            style={{ textAlign: "left", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
             title={videoTitle}
           >
             {videoTitle}
@@ -682,31 +683,33 @@ export default function ResultPage() {
           </div>
 
           {/* 右侧 - Tabs 卡片式页签 */}
-          <div className="lg:col-span-3 flex flex-col h-full w-full">
-            <Tabs
-              activeKey={tab}
-              onChange={setTab}
-              type="card"
-              items={tabItems.map((item) => ({
-                ...item,
-                label: (
-                  <span
-                    className={tab === item.key ? "gradient-text font-bold" : ""}
-                    style={{
-                      padding: "0 24px",
-                      display: "inline-block",
-                      minWidth: 80,
-                      textAlign: "center",
-                    }}
-                  >
-                    {item.label}
-                  </span>
-                ),
-              }))}
-              style={{ width: "100%" }}
-              tabBarGutter={0}
-              tabBarStyle={{ width: "100%" }}
-            />
+          <div className="lg:col-span-3 flex flex-col w-full" style={{ height: "100%" }}>
+            <div style={{ height: "100%", maxHeight: "calc(100vh - 64px - 48px)", overflow: "auto" }}>
+              <Tabs
+                activeKey={tab}
+                onChange={setTab}
+                type="card"
+                items={tabItems.map((item) => ({
+                  ...item,
+                  label: (
+                    <span
+                      className={tab === item.key ? "gradient-text font-bold" : ""}
+                      style={{
+                        padding: "0 24px",
+                        display: "inline-block",
+                        minWidth: 80,
+                        textAlign: "center",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  ),
+                }))}
+                style={{ width: "100%" }}
+                tabBarGutter={0}
+                tabBarStyle={{ width: "100%" }}
+              />
+            </div>
           </div>
         </div>
       </div>
