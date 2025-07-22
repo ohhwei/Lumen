@@ -34,6 +34,21 @@ const STANDARD_STEPS = [
   { name: "选择题/简答题生成中", status: "pending", detail: "" },
 ];
 
+async function withRetry(fn, retries = 3, interval = 2000) {
+  let lastErr;
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (i < retries - 1) {
+        await new Promise((res) => setTimeout(res, interval));
+      }
+    }
+  }
+  throw lastErr;
+}
+
 function updateStep(taskId, stepIdx, status, detail = "") {
   const task = progressMap[taskId];
   if (!task) {
@@ -332,11 +347,11 @@ router.post("/", async (req, res) => {
       async function ragAnalyze(modulePrompt) {
         // 用 referencesContext + 视频内容做拼接
         const context = referencesContext + "\n\n" + transcript;
-        return await analyzeWithDeepSeek(context + "\n\n" + modulePrompt);
+        return await withRetry(() => analyzeWithDeepSeek(context + "\n\n" + modulePrompt));
       }
       async function normalAnalyze(modulePrompt) {
         // 统一加全局角色设定
-        return await analyzeWithDeepSeek(transcript + "\n\n" + modulePrompt);
+        return await withRetry(() => analyzeWithDeepSeek(transcript + "\n\n" + modulePrompt));
       }
       // ------------------- 分步内容生成与返回 -------------------
       // 1. 先生成摘要和关键词
@@ -354,7 +369,7 @@ router.post("/", async (req, res) => {
         normalizeSummary(safeJson(summaryRaw)) ||
         (Array.isArray(keywordsRaw) ? keywordsRaw.join(" ") : "");
       updateStep(taskId, 5, "processing", "检索中");
-      const crossRefList = await searchCrossRef(searchQuery, 5);
+      const crossRefList = await withRetry(() => searchCrossRef(searchQuery, 5));
       updateStep(taskId, 5, "done", `共${crossRefList.length}条`);
       console.log(`[分析任务] [${taskId}] 文献检索完成`);
 
@@ -397,7 +412,7 @@ router.post("/", async (req, res) => {
       updateStep(taskId, 7, "processing", "生成中");
       async function ragAnalyzeWithReferences(modulePrompt) {
         const context = referencesContext + "\n\n" + transcript;
-        return await analyzeWithDeepSeek(context + "\n\n" + modulePrompt);
+        return await withRetry(() => analyzeWithDeepSeek(context + "\n\n" + modulePrompt));
       }
       const [questionsRaw, essayRaw] = await Promise.all([
         ragAnalyzeWithReferences(prompts.rag.questions),

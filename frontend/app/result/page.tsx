@@ -566,14 +566,14 @@ export default function ResultPage() {
           <div className="lg:col-span-5">
             {/* 视频播放器和关键词标签区合并到同一个白色卡片内 */}
             <div className="bg-white rounded-lg shadow p-6 w-full max-w-4xl mx-auto mb-6">
-              {analysisResult?.videoUrl && (
+              <div className="aspect-video bg-black rounded-lg overflow-hidden mx-auto">
                 <video
                   ref={videoRef}
                   src={analysisResult.videoUrl}
                   controls
-                  className="w-full"
+                  className="w-full h-full object-cover"
                 />
-              )}
+              </div>
               {keywords.length > 0 && (
                 <div
                   className="flex gap-2 mt-6 overflow-hidden w-full"
