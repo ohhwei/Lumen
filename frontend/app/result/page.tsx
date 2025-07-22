@@ -678,7 +678,7 @@ export default function ResultPage() {
               {/* 当前章节信息 */}
               <div
                 className="rounded-lg mt-4"
-                style={{ marginLeft: 20, marginRight: 20 }}
+                style={{ marginLeft: 20, marginRight: 20}}
               >
                 <h4 className="font-bold text-body mb-2">
                   {chapters[selectedChapter]?.title}
