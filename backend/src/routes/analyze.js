@@ -127,9 +127,17 @@ router.post("/", async (req, res) => {
 
   if (!url) return res.status(400).json({ error: "缺少视频链接" });
 
-  // 新增：获取视频标题
+  // 新增：获取视频标题和时长
   const meta = await validateVideoUrl(url);
   const videoTitle = meta.title || "未知视频";
+
+  // ====== 新增：视频时长限制校验（1小时=3600秒）======
+  if (meta.duration && meta.duration > 3600) {
+    return res.status(400).json({
+      error: "视频时长超过1小时，暂不支持分析。",
+    });
+  }
+  // ====== 结束 ======
 
   let realVideoUrl = url;
   // 新增：自动识别B站网页链接并转直链

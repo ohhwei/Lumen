@@ -283,7 +283,11 @@ export default function HomePage() {
           {/* 卡片区 */}
           <div className="flex gap-8">
             {visibleVideos.map((video) => (
-                <div key={video.id} className="w-60 bg-white rounded-xl border border-gray-200 flex flex-col overflow-hidden">
+                <div
+                  key={video.id}
+                  className="w-60 bg-white rounded-xl border border-gray-200 flex flex-col overflow-hidden cursor-pointer transition hover:shadow-lg"
+                  onClick={() => handleRecommendClick(video)}
+                >
                 {/* 封面区：16:9 横向比例 */}
                 <div className="w-full relative" style={{ paddingBottom: '56.25%' }}>
                   <img

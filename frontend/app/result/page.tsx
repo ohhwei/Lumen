@@ -575,9 +575,16 @@ export default function ResultPage() {
                 />
               )}
               {keywords.length > 0 && (
-                <div className="flex flex-nowrap gap-2 mt-6 overflow-hidden w-full" style={{ whiteSpace: "nowrap" }}>
+                <div
+                  className="flex gap-2 mt-6 overflow-hidden w-full"
+                  style={{ flexWrap: "nowrap", overflow: "hidden", width: "100%" }}
+                >
                   {keywords.map((kw: string, idx: number) => (
-                    <span key={idx} className="tag">
+                    <span
+                      key={idx}
+                      className="tag"
+                      style={{ flexShrink: 0, whiteSpace: "nowrap", maxWidth: "100%" }}
+                    >
                       {kw}
                     </span>
                   ))}

@@ -70,7 +70,7 @@ export default function LoadingPage() {
           clearInterval(timer);
           Modal.error({
             title: "分析失败",
-            content: data.data.error.message || "视频分析失败",
+            content: data.data.error.message || "请返回主页重试",
             centered: true,
             onOk: () => router.push("/"),
           });
