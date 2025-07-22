@@ -575,7 +575,7 @@ export default function ResultPage() {
                 />
               )}
               {keywords.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-6">
+                <div className="flex flex-nowrap gap-2 mt-6 overflow-hidden w-full" style={{ whiteSpace: "nowrap" }}>
                   {keywords.map((kw: string, idx: number) => (
                     <span key={idx} className="tag">
                       {kw}
@@ -669,7 +669,7 @@ export default function ResultPage() {
                 className="rounded-lg mt-6"
                 style={{ marginLeft: 20, marginRight: 20 }}
               >
-                <h4 className="text-subtitle mb-4">
+                <h4 className="font-bold text-body mb-2">
                   {chapters[selectedChapter]?.title}
                   <span className="text-secondary ml-2">
                     {chapters[selectedChapter]?.time}
@@ -683,33 +683,31 @@ export default function ResultPage() {
           </div>
 
           {/* 右侧 - Tabs 卡片式页签 */}
-          <div className="lg:col-span-3 flex flex-col w-full" style={{ height: "100%" }}>
-            <div style={{ height: "100%", maxHeight: "calc(100vh - 64px - 48px)", overflow: "auto" }}>
-              <Tabs
-                activeKey={tab}
-                onChange={setTab}
-                type="card"
-                items={tabItems.map((item) => ({
-                  ...item,
-                  label: (
-                    <span
-                      className={tab === item.key ? "gradient-text font-bold" : ""}
-                      style={{
-                        padding: "0 24px",
-                        display: "inline-block",
-                        minWidth: 80,
-                        textAlign: "center",
-                      }}
-                    >
-                      {item.label}
-                    </span>
-                  ),
-                }))}
-                style={{ width: "100%" }}
-                tabBarGutter={0}
-                tabBarStyle={{ width: "100%" }}
-              />
-            </div>
+          <div className="lg:col-span-3 flex flex-col h-full w-full">
+            <Tabs
+              activeKey={tab}
+              onChange={setTab}
+              type="card"
+              items={tabItems.map((item) => ({
+                ...item,
+                label: (
+                  <span
+                    className={tab === item.key ? "gradient-text font-bold" : ""}
+                    style={{
+                      padding: "0 24px",
+                      display: "inline-block",
+                      minWidth: 80,
+                      textAlign: "center",
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                ),
+              }))}
+              style={{ width: "100%" }}
+              tabBarGutter={0}
+              tabBarStyle={{ width: "100%" }}
+            />
           </div>
         </div>
       </div>
