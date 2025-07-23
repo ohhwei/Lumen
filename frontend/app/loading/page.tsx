@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Progress, Button, Modal } from "antd";
 
 // 新增内部组件，原有内容全部移到这里
@@ -13,17 +13,19 @@ function InnerLoadingPage() {
   const [error, setError] = useState<string | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [url, setUrl] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const ignoreRef = useRef(false);
 
-  // 确保组件已挂载
+  // 确保组件已挂载并获取URL参数
   useEffect(() => {
     setMounted(true);
+    // 只在客户端获取URL参数
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      setUrl(searchParams.get("url"));
+    }
   }, []);
-
-  // 获取 URL 参数，但只在客户端挂载后执行
-  const url = mounted ? searchParams?.get("url") : null;
 
   // 启动分析任务
   useEffect(() => {

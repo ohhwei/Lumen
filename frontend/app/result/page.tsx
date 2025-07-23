@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import "antd/dist/reset.css";
 import { Tabs, Card, Button, Divider } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
@@ -21,8 +21,8 @@ function InnerResultPage() {
     [key: number]: boolean;
   }>({});
   const [mounted, setMounted] = useState(false);
+  const [taskId, setTaskId] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [tab, setTab] = useState("summary");
 
   // 后端数据
@@ -30,13 +30,15 @@ function InnerResultPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // 确保组件已挂载
+  // 确保组件已挂载并获取taskId
   useEffect(() => {
     setMounted(true);
+    // 只在客户端获取URL参数
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      setTaskId(searchParams.get("taskId"));
+    }
   }, []);
-
-  // 获取 taskId，但只在客户端挂载后执行
-  const taskId = mounted ? searchParams?.get("taskId") : null;
 
   // 获取 taskId
   useEffect(() => {
