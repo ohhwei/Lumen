@@ -20,9 +20,9 @@ function InnerResultPage() {
   const [showEssayAnswers, setShowEssayAnswers] = useState<{
     [key: number]: boolean;
   }>({});
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const taskId = searchParams?.get("taskId");
   const [tab, setTab] = useState("summary");
 
   // 后端数据
@@ -30,8 +30,18 @@ function InnerResultPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // 确保组件已挂载
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 获取 taskId，但只在客户端挂载后执行
+  const taskId = mounted ? searchParams?.get("taskId") : null;
+
   // 获取 taskId
   useEffect(() => {
+    if (!mounted) return;
+    
     if (!taskId) {
       setError("未提供任务ID");
       setLoading(false);
@@ -58,7 +68,7 @@ function InnerResultPage() {
     };
 
     fetchResult();
-  }, [taskId]);
+  }, [mounted, taskId]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -147,6 +157,15 @@ function InnerResultPage() {
     deepseek?.title ||
     "未命名视频";
 
+  // 如果还没有挂载，显示基础加载状态
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
+        加载中...
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
@@ -174,7 +193,7 @@ function InnerResultPage() {
       key: "summary",
       label: "视频总结",
       children: (
-        <div className="bg-white rounded-lg shadow-md p-6 h-[688px] overflow-y-auto">
+        <div className="bg-white rounded-lg shadow-md p-6 h-[687px] overflow-y-auto">
           {/* 原 summary 区块内容 */}
           <div className="flex justify-between items-center mb-1">
             <h4 className="text-subtitle">摘要</h4>
@@ -227,7 +246,7 @@ function InnerResultPage() {
       key: "studyGuide",
       label: "学习指引",
       children: (
-        <div className="bg-white rounded-lg shadow-md p-6 h-[688px] overflow-y-auto">
+        <div className="bg-white rounded-lg shadow-md p-6 h-[687px] overflow-y-auto">
           {/* 学习指引 */}
           <div>
             <h4 className="text-subtitle mb-4">学习指引</h4>
@@ -291,7 +310,7 @@ function InnerResultPage() {
                       >
                         {ref.title || "参考资料"}
                       </div>
-                      {/* 作者：最多两行，超出省略，不显示“作者：” */}
+                      {/* 作者：最多两行，超出省略，不显示"作者：" */}
                       {ref.author && (
                         <div
                           className="text-secondary mt-1"
@@ -321,7 +340,7 @@ function InnerResultPage() {
       key: "quiz",
       label: "测一测",
       children: (
-        <div className="bg-white rounded-lg shadow-md p-6 h-[688px] overflow-y-auto">
+        <div className="bg-white rounded-lg shadow-md p-6 h-[687px] overflow-y-auto">
           <div className="space-y-8">
             {/* 选择题 */}
             <div>
@@ -733,7 +752,11 @@ function InnerResultPage() {
 // 页面默认导出只负责 Suspense 包裹
 export default function ResultPage() {
   return (
-    <Suspense fallback={<div>加载中...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
+        加载中...
+      </div>
+    }>
       <InnerResultPage />
     </Suspense>
   );

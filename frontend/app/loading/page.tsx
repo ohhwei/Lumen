@@ -12,15 +12,24 @@ function InnerLoadingPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const url = searchParams?.get("url");
   const ignoreRef = useRef(false);
+
+  // 确保组件已挂载
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 获取 URL 参数，但只在客户端挂载后执行
+  const url = mounted ? searchParams?.get("url") : null;
 
   // 启动分析任务
   useEffect(() => {
+    if (!mounted || !url) return;
+    
     ignoreRef.current = false;
-    if (!url) return;
     fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -51,10 +60,12 @@ function InnerLoadingPage() {
     return () => {
       ignoreRef.current = true;
     };
-  }, [url, router]);
+  }, [mounted, url, router]);
 
   // 轮询后端进度API
   useEffect(() => {
+    if (!mounted) return;
+    
     const searchParams = new URLSearchParams(window.location.search);
     const tid = searchParams.get("taskId");
     if (!tid) return;
@@ -91,7 +102,37 @@ function InnerLoadingPage() {
       }
     }, 2000);
     return () => clearInterval(timer);
-  }, [router]);
+  }, [mounted, router]);
+
+  // 如果还没有挂载，显示基础加载状态
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50">
+        <div className="flex flex-col items-center w-full max-w-md">
+          <div className="text-2xl font-bold text-gray-900 mb-4 text-center">
+            正在分析视频内容
+          </div>
+          <div className="text-secondary mb-4">
+            可能需稍候3~5分钟
+          </div>
+          <Progress
+            percent={8}
+            showInfo={false}
+            strokeColor={{ from: "#1677ff", to: "#52c41a" }}
+            className="w-full mb-4"
+          />
+          <div className="w-full flex justify-between text-gray-400 text-xs mb-4">
+            <span>0%</span>
+            <span>8%</span>
+            <span>100%</span>
+          </div>
+          <div className="w-full flex justify-center items-center mb-8">
+            <span className="text-body">准备中...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // 只显示当前步骤文本
   const currentStepText =
@@ -138,7 +179,32 @@ function InnerLoadingPage() {
 // 页面默认导出只负责 Suspense 包裹
 export default function LoadingPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50">
+        <div className="flex flex-col items-center w-full max-w-md">
+          <div className="text-2xl font-bold text-gray-900 mb-4 text-center">
+            正在分析视频内容
+          </div>
+          <div className="text-secondary mb-4">
+            可能需稍候3~5分钟
+          </div>
+          <Progress
+            percent={8}
+            showInfo={false}
+            strokeColor={{ from: "#1677ff", to: "#52c41a" }}
+            className="w-full mb-4"
+          />
+          <div className="w-full flex justify-between text-gray-400 text-xs mb-4">
+            <span>0%</span>
+            <span>8%</span>
+            <span>100%</span>
+          </div>
+          <div className="w-full flex justify-center items-center mb-8">
+            <span className="text-body">准备中...</span>
+          </div>
+        </div>
+      </div>
+    }>
       <InnerLoadingPage />
     </Suspense>
   );
