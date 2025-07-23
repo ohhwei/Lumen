@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import "antd/dist/reset.css";
 import { Tabs, Card, Button, Divider } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
@@ -10,7 +11,17 @@ import { LeftOutlined } from "@ant-design/icons";
 
 const chineseNumbers = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
 
-// 新增内部组件，原有内容全部移到这里
+// 动态导入的客户端组件
+const ClientResultPage = dynamic(() => Promise.resolve(InnerResultPage), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
+      加载中...
+    </div>
+  )
+});
+
+// 内部组件，现在完全在客户端渲染
 function InnerResultPage() {
   const [selectedChapter, setSelectedChapter] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{
@@ -20,7 +31,6 @@ function InnerResultPage() {
   const [showEssayAnswers, setShowEssayAnswers] = useState<{
     [key: number]: boolean;
   }>({});
-  const [mounted, setMounted] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(null);
   const router = useRouter();
   const [tab, setTab] = useState("summary");
@@ -30,10 +40,8 @@ function InnerResultPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // 确保组件已挂载并获取taskId
+  // 获取taskId
   useEffect(() => {
-    setMounted(true);
-    // 只在客户端获取URL参数
     if (typeof window !== 'undefined') {
       const searchParams = new URLSearchParams(window.location.search);
       setTaskId(searchParams.get("taskId"));
@@ -42,8 +50,6 @@ function InnerResultPage() {
 
   // 获取 taskId
   useEffect(() => {
-    if (!mounted) return;
-    
     if (!taskId) {
       setError("未提供任务ID");
       setLoading(false);
@@ -70,7 +76,7 @@ function InnerResultPage() {
     };
 
     fetchResult();
-  }, [mounted, taskId]);
+  }, [taskId]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -158,15 +164,6 @@ function InnerResultPage() {
     deepseek?.videoTitle ||
     deepseek?.title ||
     "未命名视频";
-
-  // 如果还没有挂载，显示基础加载状态
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
-        加载中...
-      </div>
-    );
-  }
 
   if (loading) {
     return (
@@ -751,15 +748,7 @@ function InnerResultPage() {
   );
 }
 
-// 页面默认导出只负责 Suspense 包裹
+// 页面默认导出
 export default function ResultPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
-        加载中...
-      </div>
-    }>
-      <InnerResultPage />
-    </Suspense>
-  );
+  return <ClientResultPage />;
 }
